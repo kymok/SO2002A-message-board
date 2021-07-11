@@ -1,0 +1,83 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="./static/index.css" />
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    </head>
+    <body>
+        <h1>OLED Message</h1>
+        <p>Text:</p>
+        <div class="input-wrapper">
+            <div class="editor-preview" id="oled-preview"></div>
+            <div class="editor-input" id="oled-input" contenteditable="true"></div>
+        </div>
+        <p>
+            <a href="javascript:void(0)" id="clear-button" type="button">Clear</a>
+            ·
+            <a href="javascript:void(0)" id="send-button" type="button">Write to OLED</a>
+        </p>
+    </body>
+    <script type="text/javascript">
+        const nCols = 20;
+        const nLines = 2;
+
+        const inputElement = document.getElementById('oled-input');
+        const previewElement = document.getElementById('oled-preview');
+        const clearButtonElement = document.getElementById('clear-button');
+        const sendButtonElement = document.getElementById('send-button');
+
+        let displayText = {{ message | tojson }};
+
+        const updateText = () => {
+            // Parse input text
+            const formattedText = displayText.map(
+                (item, index) => {
+                    const normalText = item.slice(0,nCols);
+                    const overflowText = item.slice(nCols);
+                    if (index >= nLines) {
+                        return '<span class="overflow">' + item + '</span>';
+                    }
+                    return normalText + '<span class="overflow">' + overflowText + '</span>';
+                }
+            )
+            // Update preview text
+            previewElement.innerHTML = formattedText.join('<br>');
+        }
+
+        const handleTextChange = (event) => {
+            const text = inputElement.innerText;
+            const parsedText = text.replace('\r', '').split('\n');
+            displayText = parsedText;
+            updateText();
+        }
+
+        const send = () => {
+            const data = JSON.stringify({value: displayText});
+            fetch('./set', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: data})
+                .then(
+                    response => response.text()
+                ).then(
+                    data => console.log(data)
+                )
+        }
+
+        const handleClearButton = () => {
+            displayText = [];
+            inputElement.innerText = '';
+            updateText();
+        }
+
+        // initialise
+        inputElement.innerText = displayText.join('\n');
+        handleTextChange();
+
+        // add event listeners
+        inputElement.addEventListener('input', handleTextChange)
+        clearButtonElement.addEventListener('click', handleClearButton)
+        sendButtonElement.addEventListener('click', send)
+    </script>
+</html>

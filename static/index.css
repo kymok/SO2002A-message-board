@@ -1,0 +1,28 @@
+.input-wrapper {
+    position: relative;
+}
+
+.editor-input, .editor-preview {
+    width: 20em;
+    height: 4em;
+    padding: 0.25em;
+    display: inline-block; /* FIXME hacky solution. To prevent Chrome from adding div on newline */
+    font-size: 1em;
+    line-height: 1.2em;
+    overflow-wrap: normal;
+    font-family: 'Menlo', 'DejaVu Sans Mono', 'Consolas', 'Lucida Console', monospace;
+}
+
+.editor-preview {
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+    border: 1px solid black;
+    border-radius: 4px;
+    color: rgba(0,0,0,0);
+}
+
+.overflow {
+    background-color: rgba(255,0,0,0.3)
+}
